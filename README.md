@@ -2,6 +2,14 @@
 
 A professional, full-featured resume builder that leverages Google's Gemini AI to help users craft high-quality resumes. Create, format, and export your professional history with the power of generative AI.
 
+## 📸 Screenshots
+
+### Home Page (First Screen)
+![Home Page](public/home_screen.png)
+
+### Editor Page (Second Screen)
+![Editor Page](public/editor_screen.png)
+
 ## 🚀 Features
 
 - **AI Content Generation:** Automatically generate professional summaries and work experience bullet points using Google Gemini.
