@@ -1,0 +1,540 @@
+/* ============================================
+   RESUME EDITOR — Complete Styles
+   ============================================ */
+
+/* ---------- Main Container ---------- */
+.resume-editor-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--code-bg);
+    overflow: hidden;
+    position: relative;
+}
+
+/* ---------- Scrollable Editor Area ---------- */
+.editor-scroll-area {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 40px;
+    background: var(--code-bg);
+    position: relative;
+}
+
+.editor-zoom-wrapper {
+    transition: transform 0.2s ease;
+    will-change: transform;
+}
+
+/* ---------- Paper (the white document area) ---------- */
+.editor-paper {
+    width: var(--page-width, 793.7px);
+    /* Content defines height, not the calculated total. This stops the loop. */
+    min-height: var(--paper-min-height, 1122.5px);
+    height: auto !important;
+    background: #ffffff;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(0, 0, 0, 0.04);
+    border-radius: 2px;
+    position: relative;
+    transition: none;
+    /* Disable transitions to avoid measuring height during animation */
+}
+
+.page-labels-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* ---------- Page Number Labels ---------- */
+.page-number-label {
+    position: absolute;
+    left: -36px;
+    transform: translateY(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
+    opacity: 0.4;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.03);
+    user-select: none;
+    pointer-events: none;
+}
+
+/* ---------- Quill Editor Customization ---------- */
+/* Hide Quill's built-in toolbar (we use our own) */
+.resume-quill-editor .ql-toolbar {
+    display: none !important;
+}
+
+.resume-quill-editor .ql-container {
+    border: none !important;
+    font-size: 14px;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.resume-quill-editor .ql-editor {
+    padding: var(--margin-top, 96px) var(--margin-right, 96px) var(--margin-bottom, 96px) var(--margin-left, 96px);
+    min-height: var(--page-height, 1122.5px);
+    line-height: 1.7;
+    color: #1a1a2e;
+    font-size: 14px;
+    position: relative;
+    overflow: hidden !important;
+    /* Prevents internal scrollbars from triggering loops */
+}
+
+.resume-quill-editor .ql-editor:focus {
+    outline: none;
+}
+
+/* Quill editor placeholder */
+.resume-quill-editor .ql-editor.ql-blank::before {
+    font-style: normal;
+    color: #aaa;
+    content: 'Start typing your resume...';
+    pointer-events: none;
+}
+
+/* ── Quill content styles (inside the editor) ── */
+.resume-quill-editor .ql-editor h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #1a1a2e;
+    line-height: 1.3;
+}
+
+.resume-quill-editor .ql-editor h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem;
+    color: #2d2d44;
+    border-bottom: 2px solid #f0f0f5;
+    padding-bottom: 0.4rem;
+    line-height: 1.4;
+}
+
+.resume-quill-editor .ql-editor h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.25rem;
+    color: #3d3d5c;
+    line-height: 1.4;
+}
+
+.resume-quill-editor .ql-editor p {
+    margin: 0.3rem 0;
+    color: #4a4a6a;
+}
+
+.resume-quill-editor .ql-editor hr {
+    border: none;
+    border-top: 1px solid #e5e4e7;
+    margin: 1rem 0;
+}
+
+.resume-quill-editor .ql-editor ul,
+.resume-quill-editor .ql-editor ol {
+    padding-left: 1.5em;
+    margin: 0.5rem 0;
+}
+
+.resume-quill-editor .ql-editor li {
+    margin: 0.2rem 0;
+    color: #4a4a6a;
+}
+
+.resume-quill-editor .ql-editor blockquote {
+    border-left: 4px solid var(--accent);
+    padding-left: 1rem;
+    margin: 0.75rem 0;
+    color: #666;
+    font-style: italic;
+}
+
+.resume-quill-editor .ql-editor a {
+    color: var(--text);
+    text-decoration: underline;
+}
+
+/* ── Page break indicator (injected by usePagination) ── */
+.page-break-indicator {
+    pointer-events: none;
+}
+
+/* ── Quill Snow theme overrides ── */
+.resume-quill-editor.ql-snow {
+    border: none !important;
+}
+
+.resume-quill-editor .ql-snow .ql-tooltip {
+    z-index: 100;
+}
+
+/* ---------- Action Bar ---------- */
+.editor-action-bar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 6px 14px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    gap: 8px;
+}
+
+.action-print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+}
+
+.action-print-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+.action-print-btn:active {
+    transform: translateY(0);
+}
+
+/* ---------- Resume Viewer (Read-only Mode) ---------- */
+.viewer-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--code-bg);
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+    /* allow flex child to shrink properly */
+}
+
+.viewer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+}
+
+.viewer-toolbar h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-h);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+/* Scrollable area that holds the pages */
+.viewer-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 32px 24px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: var(--code-bg);
+    min-height: 0;
+}
+
+/* Wrapper around the AI-generated HTML — scoped only to the viewer */
+.viewer-scroll-area [data-document] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+/* Each individual page — scoped only to viewer, never bleeds into chat */
+.viewer-scroll-area [data-page] {
+    width: var(--page-width, 210mm) !important;
+    min-height: var(--page-height, 297mm) !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: var(--margin-top, 25.4mm) var(--margin-right, 25.4mm) var(--margin-bottom, 25.4mm) var(--margin-left, 25.4mm) !important;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.resume-paper:hover {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.16);
+}
+
+/* Download Button */
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--linear-gradient);
+    color: white;
+    padding: 0.6rem 1.4rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+}
+
+.download-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    scale: 1.02;
+}
+
+.download-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+    .editor-scroll-area {
+        padding: 16px 8px 32px;
+    }
+
+    .page-number-label {
+        left: -28px;
+        width: 20px;
+        height: 20px;
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 768px) {
+    .editor-scroll-area {
+        padding: 12px 4px 24px;
+    }
+
+    .page-number-label {
+        display: none;
+    }
+
+    .viewer-container {
+        padding: 0.75rem;
+    }
+
+    .viewer-toolbar h2 {
+        font-size: 0.95rem;
+    }
+
+    .viewer-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .resume-paper {
+        width: 100%;
+        min-width: unset;
+        max-width: 100%;
+        height: 90vh;
+    }
+
+    .resume-content {
+        padding: 1.5rem 1rem;
+        font-size: 13px;
+    }
+
+    .resume-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .resume-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .resume-content h3 {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .editor-scroll-area {
+        padding: 8px 2px 16px;
+    }
+
+    .viewer-container {
+        padding: 0.5rem;
+    }
+
+    .resume-paper {
+        height: 85vh;
+    }
+
+    .resume-content {
+        padding: 1rem 0.75rem;
+        font-size: 12px;
+    }
+
+    .resume-content h1 {
+        font-size: 1.3rem;
+    }
+
+    .download-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .action-print-btn {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+}
+
+.resume-doc-wrapper {
+    outline: none;
+}
+
+/* Scoped resets for raw resume HTML in viewer to prevent bloated browser user-agent margins and line spacings */
+.resume-doc-wrapper h1,
+.resume-doc-wrapper h2,
+.resume-doc-wrapper h3,
+.resume-doc-wrapper h4,
+.resume-doc-wrapper h5,
+.resume-doc-wrapper h6,
+.resume-doc-wrapper p,
+.resume-doc-wrapper ul,
+.resume-doc-wrapper ol,
+.resume-doc-wrapper li {}
+
+.resume-doc-wrapper ul,
+.resume-doc-wrapper ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.resume-doc-wrapper li {
+    margin-bottom: 0.2rem;
+}
+
+/* ============================================
+   PRINT — native text PDF via window.print()
+   ============================================ */
+@media print {
+
+    html,
+    body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    @page {
+        size: var(--page-width, 210mm) var(--page-height, 297mm) portrait;
+        margin: 0;
+    }
+
+    /* Ensure colours render */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Hide all app chrome */
+    .builder-nav,
+    .right-pane,
+    .no-print,
+    .viewer-toolbar,
+    .editor-scroll-area,
+    .editor-action-bar,
+    .editor-status-bar,
+    .editor-toolbar {
+        display: none !important;
+    }
+
+    /* Reset layout containers so they don't clip */
+    .builder-page,
+    .builder-layout,
+    .left-pane,
+    .viewer-container,
+    .viewer-scroll-area,
+    .resume-doc-wrapper {
+        display: block !important;
+        overflow: visible !important;
+        height: auto !important;
+        width: 100% !important;
+        background: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        position: static !important;
+        border: none !important;
+        gap: 0 !important;
+    }
+
+    /* Flatten the data-document wrapper */
+    .viewer-scroll-area [data-document] {
+        display: block !important;
+        gap: 0 !important;
+    }
+
+    /* Allow the page container to grow and split automatically when printing */
+    .viewer-scroll-area [data-page] {
+        display: block !important;
+        width: 100% !important;
+        /* Let print page margins determine width */
+        height: auto !important;
+        min-height: unset !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        /* Remove padding during print so browser @page margin is used exclusively */
+        box-shadow: none !important;
+        page-break-inside: auto !important;
+        page-break-after: auto !important;
+        break-after: auto !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Prevent resume elements from breaking mid-content across printed pages */
+    .viewer-scroll-area [data-page] h1,
+    .viewer-scroll-area [data-page] h2,
+    .viewer-scroll-area [data-page] h3,
+    .viewer-scroll-area [data-page] h4,
+    .viewer-scroll-area [data-page] h5,
+    .viewer-scroll-area [data-page] h6,
+    .viewer-scroll-area [data-page] p,
+    .viewer-scroll-area [data-page] li {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
