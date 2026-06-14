@@ -36,7 +36,7 @@ export const ResumeProvider = ({ children }) => {
     const [pageSize, setPageSize] = useState(EDITOR_DEFAULTS.pageSize);
     const [orientation, setOrientation] = useState('portrait'); // added orientation state
     const [zoom, setZoom] = useState(EDITOR_DEFAULTS.zoom);
-    const [margins, setMargins] = useState({ ...EDITOR_DEFAULTS.margins });
+    const [margins, setMargins] = useState({ ...MARGIN_PRESETS.Narrow });
     const [marginPreset, setMarginPreset] = useState('Narrow');
     const [documentTitle, setDocumentTitle] = useState('My Resume');
 

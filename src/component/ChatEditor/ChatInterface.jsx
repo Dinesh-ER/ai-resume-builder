@@ -304,6 +304,7 @@ function ChatInterface() {
         const change = message.changes?.[changeIndex];
 
         if (!change) return;
+        if (change.status === "applied") return;
 
         if (change.type === "setting") {
             // Page size handling
@@ -343,15 +344,10 @@ function ChatInterface() {
         setResumeHTML(prev => {
             const normalizedPrev = prev.replace(/\s+/g, " ");
             const normalizedOld = change.oldHTML.replace(/\s+/g, " ");
-            console.log(
-                '......................setResumeHTML......................\n', prev,
-                '\n......................normalizedPrev......................\n', normalizedPrev,
-                '\n......................normalizedOld......................\n', normalizedOld
-            );
             if (normalizedPrev.includes(normalizedOld)) {
 
-                setChatHistory(prev => {
-                    const copy = [...prev];
+                setChatHistory(prevHist => {
+                    const copy = [...prevHist];
                     copy[messageIndex].changes[changeIndex].status = "applied";
                     return [...copy];
                 });
@@ -366,6 +362,52 @@ function ChatInterface() {
     };
 
     const handleRejectChange = (messageIndex, changeIndex) => {
+        const message = chatHistory[messageIndex];
+        const change = message.changes?.[changeIndex];
+
+        if (!change) return;
+        if (change.status === "rejected") return;
+
+        if (change.status === "applied") {
+            if (change.type === "setting") {
+                setChatHistory(prev => {
+                    const copy = [...prev];
+                    copy[messageIndex].changes[changeIndex].status = "rejected";
+                    return [...copy];
+                });
+                return;
+            }
+
+            if (change.type === "document") {
+                setResumeHTML(change.oldHTML);
+                setChatHistory(prev => {
+                    const copy = [...prev];
+                    copy[messageIndex].changes[changeIndex].status = "rejected";
+                    return [...copy];
+                });
+                return;
+            }
+
+            setResumeHTML(prev => {
+                const normalizedPrev = prev.replace(/\s+/g, " ");
+                const normalizedNew = change.newHTML.replace(/\s+/g, " ");
+                if (normalizedPrev.includes(normalizedNew)) {
+                    setChatHistory(prevHist => {
+                        const copy = [...prevHist];
+                        copy[messageIndex].changes[changeIndex].status = "rejected";
+                        return [...copy];
+                    });
+
+                    return prev.replace(
+                        change.newHTML.trim(),
+                        change.oldHTML.trim()
+                    );
+                }
+                return prev;
+            });
+            return;
+        }
+
         setChatHistory(prev => {
             const newHistory = [...prev];
             const msg = { ...newHistory[messageIndex], changes: [...newHistory[messageIndex].changes] };
@@ -587,7 +629,16 @@ const ChatMessage = memo(({ message, index, onApply, onReject, setShowPreviewMod
                             ) : (
                                 <div className="change-comparison">
                                     <div className="comparison-box old">
-                                        <span className="comparison-label">Current <ExpandIcon onClick={() => handleExpandOld(change.oldHTML)} /></span>
+                                        <div className="comparison-header">
+                                            <span className="comparison-label">Current <ExpandIcon onClick={() => handleExpandOld(change.oldHTML)} /></span>
+                                            <button 
+                                                className={`apply-old-btn-mini ${change.status === 'rejected' ? 'active-applied' : ''}`}
+                                                onClick={() => onReject(index, cIdx)}
+                                                title="Apply this old version back to the document"
+                                            >
+                                                {change.status === 'rejected' ? '✓ Applied Old' : 'Apply Old'}
+                                            </button>
+                                        </div>
                                         <div className="page-preview">
                                             <div
                                                 dangerouslySetInnerHTML={{
@@ -611,16 +662,20 @@ const ChatMessage = memo(({ message, index, onApply, onReject, setShowPreviewMod
                                 </div>
                             )}
 
-                            {change.status === 'pending' ? (
-                                <div className="change-actions-mini">
-                                    <button onClick={() => onApply(index, cIdx)} className="mini-btn approve-btn">Accept</button>
-                                    <button onClick={() => onReject(index, cIdx)} className="mini-btn reject-btn">Reject</button>
-                                </div>
-                            ) : (
-                                <div className={`message-status ${change.status}`}>
-                                    {change.status === 'applied' ? '✓ Applied' : '✗ Rejected'}
-                                </div>
-                            )}
+                            <div className="change-actions-mini">
+                                <button 
+                                    onClick={() => onApply(index, cIdx)} 
+                                    className={`mini-btn approve-btn ${change.status === 'applied' ? 'active-applied' : ''}`}
+                                >
+                                    {change.status === 'applied' ? '✓ Accepted' : 'Accept'}
+                                </button>
+                                <button 
+                                    onClick={() => onReject(index, cIdx)} 
+                                    className={`mini-btn reject-btn ${change.status === 'rejected' ? 'active-rejected' : ''}`}
+                                >
+                                    {change.status === 'rejected' ? '✗ Rejected' : 'Reject'}
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
