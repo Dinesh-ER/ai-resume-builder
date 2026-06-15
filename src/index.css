@@ -22,7 +22,7 @@
   --accepted-color: #0c3114;
   --accepted-border: 1px solid #000000;
   --rejected-background: #f8d7da;
-  --rejected-color: #721c24;
+  --rejected-color: #753535;
   --rejected-border: 1px solid #f5c6cb;
 
   --text: #a1a1aa;
@@ -39,10 +39,10 @@
   --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
   --linear-gradient: linear-gradient(30deg, var(--accent), var(--accent-hover));
   --accepted-background: #d4edda;
-  --accepted-color: #155724;
+  --accepted-color: #22c55e;
   --accepted-border: 1px solid #c3e6cb;
   --rejected-background: #f8d7da;
-  --rejected-color: #721c24;
+  --rejected-color: #ef4444;
   --rejected-border: 1px solid #f5c6cb;
 
 }

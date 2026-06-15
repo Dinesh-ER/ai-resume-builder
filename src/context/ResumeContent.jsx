@@ -36,9 +36,10 @@ export const ResumeProvider = ({ children }) => {
     const [pageSize, setPageSize] = useState(EDITOR_DEFAULTS.pageSize);
     const [orientation, setOrientation] = useState('portrait'); // added orientation state
     const [zoom, setZoom] = useState(EDITOR_DEFAULTS.zoom);
-    const [margins, setMargins] = useState({ ...EDITOR_DEFAULTS.margins });
+    const [margins, setMargins] = useState({ ...MARGIN_PRESETS.Narrow });
     const [marginPreset, setMarginPreset] = useState('Narrow');
     const [documentTitle, setDocumentTitle] = useState('My Resume');
+    const [selectionRequest, setSelectionRequest] = useState(null);
 
 
     // Helper to change margin preset
@@ -59,6 +60,7 @@ export const ResumeProvider = ({ children }) => {
             margins, setMargins,
             marginPreset, applyMarginPreset,
             documentTitle, setDocumentTitle,
+            selectionRequest, setSelectionRequest,
             applySettings: (change) => {
                 if (change.settings?.pageSize) {
                     const sizeKey = ["A4", "Letter", "Legal", "A3", "A5"].find(

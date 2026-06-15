@@ -109,11 +109,14 @@ const extractPdfText = async (file) => {
 
 const extractDocxText = async (file) => {
     const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({
+    const htmlResult = await mammoth.convertToHtml({
+        arrayBuffer
+    });
+    const textResult = await mammoth.extractRawText({
         arrayBuffer
     });
 
-    const len = Math.ceil(result.value.length / 1500);
+    const len = Math.ceil(textResult.value.length / 1500) || 1;
 
     if (len > 5) {
         alert("File is too large, max 5 pages allowed");
@@ -121,12 +124,12 @@ const extractDocxText = async (file) => {
     }
 
     console.log('pageCount',
-        result.value,
+        JSON.stringify(htmlResult.value),
         len
     )
 
     return {
-        text: result.value,
+        text: htmlResult.value,
         pageCount: len
     };
 };

@@ -4,8 +4,82 @@ import { PAGE_SIZES } from "../../utils/pageConstants.js";
 import "./ResumeViewer.css";
 
 function ResumeViewer() {
-    const { resumeHTML, pageSize: pageSizeName, orientation, margins, documentTitle } = useContext(ResumeContext);
+    const { resumeHTML, pageSize: pageSizeName, orientation, margins, documentTitle, setSelectionRequest } = useContext(ResumeContext);
     const [pageBreaks, setPageBreaks] = useState([]);
+    const [selectedText, setSelectedText] = useState("");
+    const [selectionInstruction, setSelectionInstruction] = useState("");
+    const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+    const [highlightRects, setHighlightRects] = useState([]);
+
+    useEffect(() => {
+        const handleMouseUp = (e) => {
+            const popup = document.getElementById("selection-popup-floating");
+            if (popup && popup.contains(e.target)) {
+                return;
+            }
+
+            const selection = window.getSelection();
+            if (!selection) return;
+            const text = selection.toString().trim();
+            if (text) {
+                const container = document.getElementById("resume-print-area");
+                if (container && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0).cloneRange();
+                    const wrapper = container.parentElement;
+                    if (wrapper && container.contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const wrapperRect = wrapper.getBoundingClientRect();
+                        
+                        setSelectedText(text);
+                        setPopupPosition({
+                            top: rect.bottom - wrapperRect.top + 8,
+                            left: rect.left - wrapperRect.left + rect.width / 2
+                        });
+
+                        // Calculate rects for highlight relative to wrapper
+                        const clientRects = Array.from(range.getClientRects());
+                        const hRects = clientRects.map(r => ({
+                            top: r.top - wrapperRect.top,
+                            left: r.left - wrapperRect.left,
+                            width: r.width,
+                            height: r.height
+                        }));
+                        setHighlightRects(hRects);
+
+                        // Clear native selection so it doesn't conflict visually
+                        window.getSelection().removeAllRanges();
+                        return;
+                    }
+                }
+            }
+            setSelectedText("");
+        };
+
+        document.addEventListener("mouseup", handleMouseUp);
+        return () => {
+            document.removeEventListener("mouseup", handleMouseUp);
+        };
+    }, []);
+
+    // Clear highlights when selectedText is cleared
+    useEffect(() => {
+        if (!selectedText) {
+            setHighlightRects([]);
+            setSelectionInstruction("");
+        }
+    }, [selectedText]);
+
+    const handleSelectionSubmit = () => {
+        if (!selectionInstruction.trim()) return;
+        setSelectionRequest({
+            selectedText,
+            instruction: selectionInstruction
+        });
+        setSelectedText("");
+        setSelectionInstruction("");
+        setHighlightRects([]);
+    };
+
     const printAreaRef = useRef(null);
 
     console.log(pageBreaks, 'pageBreaks');
@@ -231,6 +305,59 @@ function ResumeViewer() {
                             </div>
                         );
                     })}
+
+                    {/* Persistent Text Highlights */}
+                    {highlightRects.map((rect, i) => (
+                        <div
+                            key={`highlight-${i}`}
+                            className="no-print"
+                            style={{
+                                position: 'absolute',
+                                top: `${rect.top}px`,
+                                left: `${rect.left}px`,
+                                width: `${rect.width}px`,
+                                height: `${rect.height}px`,
+                                backgroundColor: 'rgba(124, 58, 237, 0.35)',
+                                pointerEvents: 'none',
+                                zIndex: 5,
+                                borderRadius: '2px'
+                            }}
+                        />
+                    ))}
+
+                    {/* Popup moved inside relative wrapper so it scrolls with the document */}
+                    {selectedText && (
+                        <div 
+                            id="selection-popup-floating" 
+                            className="selection-popup-floating no-print"
+                            style={{
+                                position: 'absolute',
+                                top: `${popupPosition.top}px`,
+                                left: `${popupPosition.left}px`,
+                                transform: 'translateX(-50%)',
+                                zIndex: 10000
+                            }}
+                        >
+                            <input
+                                type="text"
+                                className="popup-floating-input"
+                                placeholder="Modify selection..."
+                                value={selectionInstruction}
+                                onChange={(e) => setSelectionInstruction(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSelectionSubmit();
+                                    }
+                                }}
+                                autoFocus
+                            />
+                            <button className="popup-floating-send" onClick={handleSelectionSubmit} title="Send to AI">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

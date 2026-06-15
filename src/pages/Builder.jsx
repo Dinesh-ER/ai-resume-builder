@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState, useTransition, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeContext } from "../context/ResumeContent.jsx";
-import ResumePreview from "../component/ResumePreview/ResumePreview.jsx";
 import ResumeViewer from "../component/ResumePreview/ResumeViewer.jsx";
 import ChatInterface from "../component/ChatEditor/ChatInterface.jsx";
 import "../styles/Builder.css";

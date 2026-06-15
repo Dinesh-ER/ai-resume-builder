@@ -98,7 +98,7 @@ const CloseIcon = () => (
 );
 
 function ChatInterface() {
-    const { resumeHTML, setResumeHTML, chatHistory, setChatHistory, pageSize, setPageSize, orientation, setOrientation } = useContext(ResumeContext);
+    const { resumeHTML, setResumeHTML, chatHistory, setChatHistory, pageSize, setPageSize, orientation, setOrientation, selectionRequest, setSelectionRequest } = useContext(ResumeContext);
 
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     const [userInput, setUserInput] = useState("");
@@ -111,16 +111,17 @@ function ChatInterface() {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [chatHistory, loading]);
 
-    const handleSendMessage = async () => {
+    const handleSendMessage = async (customText) => {
         if (!apiKey) {
             alert("Please set your VITE_GEMINI_API_KEY in the .env file.");
             return;
         }
-        if (!userInput.trim()) return;
+        const textToSend = typeof customText === "string" ? customText : userInput;
+        if (!textToSend.trim()) return;
 
         const userMessage = {
             role: "user",
-            content: userInput,
+            content: textToSend,
             timestamp: new Date().toLocaleTimeString()
         };
 
@@ -128,14 +129,16 @@ function ChatInterface() {
         startTransition(() => {
             setChatHistory(prev => [...prev, userMessage]);
         });
-        setUserInput("");
+        if (typeof customText !== "string") {
+            setUserInput("");
+        }
         setLoading(true);
 
         try {
             const genAI = new GoogleGenerativeAI(apiKey);
             const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
 
-            const systemPrompt = getPromt({ resumeHTML, userInput });
+            const systemPrompt = getPromt({ resumeHTML, userInput: textToSend });
 
             const result = await model.generateContent(systemPrompt);
             const responseText = result.response.text();
@@ -299,11 +302,25 @@ function ChatInterface() {
         }
     };
 
+    useEffect(() => {
+        if (selectionRequest) {
+            const { selectedText, instruction } = selectionRequest;
+            setSelectionRequest(null);
+
+            const prompt = `Please update the following selected text in the resume:
+Selected Text: "${selectedText}"
+My instruction for this selection: "${instruction}"`;
+
+            handleSendMessage(prompt);
+        }
+    }, [selectionRequest]);
+
     const handleApplyChange = (messageIndex, changeIndex) => {
         const message = chatHistory[messageIndex];
         const change = message.changes?.[changeIndex];
 
         if (!change) return;
+        if (change.status === "applied") return;
 
         if (change.type === "setting") {
             // Page size handling
@@ -343,15 +360,10 @@ function ChatInterface() {
         setResumeHTML(prev => {
             const normalizedPrev = prev.replace(/\s+/g, " ");
             const normalizedOld = change.oldHTML.replace(/\s+/g, " ");
-            console.log(
-                '......................setResumeHTML......................\n', prev,
-                '\n......................normalizedPrev......................\n', normalizedPrev,
-                '\n......................normalizedOld......................\n', normalizedOld
-            );
             if (normalizedPrev.includes(normalizedOld)) {
 
-                setChatHistory(prev => {
-                    const copy = [...prev];
+                setChatHistory(prevHist => {
+                    const copy = [...prevHist];
                     copy[messageIndex].changes[changeIndex].status = "applied";
                     return [...copy];
                 });
@@ -366,6 +378,52 @@ function ChatInterface() {
     };
 
     const handleRejectChange = (messageIndex, changeIndex) => {
+        const message = chatHistory[messageIndex];
+        const change = message.changes?.[changeIndex];
+
+        if (!change) return;
+        if (change.status === "rejected") return;
+
+        if (change.status === "applied") {
+            if (change.type === "setting") {
+                setChatHistory(prev => {
+                    const copy = [...prev];
+                    copy[messageIndex].changes[changeIndex].status = "rejected";
+                    return [...copy];
+                });
+                return;
+            }
+
+            if (change.type === "document") {
+                setResumeHTML(change.oldHTML);
+                setChatHistory(prev => {
+                    const copy = [...prev];
+                    copy[messageIndex].changes[changeIndex].status = "rejected";
+                    return [...copy];
+                });
+                return;
+            }
+
+            setResumeHTML(prev => {
+                const normalizedPrev = prev.replace(/\s+/g, " ");
+                const normalizedNew = change.newHTML.replace(/\s+/g, " ");
+                if (normalizedPrev.includes(normalizedNew)) {
+                    setChatHistory(prevHist => {
+                        const copy = [...prevHist];
+                        copy[messageIndex].changes[changeIndex].status = "rejected";
+                        return [...copy];
+                    });
+
+                    return prev.replace(
+                        change.newHTML.trim(),
+                        change.oldHTML.trim()
+                    );
+                }
+                return prev;
+            });
+            return;
+        }
+
         setChatHistory(prev => {
             const newHistory = [...prev];
             const msg = { ...newHistory[messageIndex], changes: [...newHistory[messageIndex].changes] };
@@ -481,7 +539,7 @@ const ChatMessage = memo(({ message, index, onApply, onReject, setShowPreviewMod
     // Simple helper to convert basic Markdown-style bold and lists to HTML
     const formatContent = (text) => {
         if (!text) return "";
-        
+
         let html = text;
 
         // 1. Headers: ###, ##, #
@@ -611,16 +669,46 @@ const ChatMessage = memo(({ message, index, onApply, onReject, setShowPreviewMod
                                 </div>
                             )}
 
-                            {change.status === 'pending' ? (
-                                <div className="change-actions-mini">
-                                    <button onClick={() => onApply(index, cIdx)} className="mini-btn approve-btn">Accept</button>
-                                    <button onClick={() => onReject(index, cIdx)} className="mini-btn reject-btn">Reject</button>
-                                </div>
-                            ) : (
-                                <div className={`message-status ${change.status}`}>
-                                    {change.status === 'applied' ? '✓ Applied' : '✗ Rejected'}
-                                </div>
-                            )}
+                            <div className="change-actions-mini">
+                                {!change.status || change.status === 'pending' ? (
+                                    <>
+                                        <button
+                                            onClick={() => onApply(index, cIdx)}
+                                            className="mini-btn approve-btn"
+                                        >
+                                            Accept
+                                        </button>
+                                        <button
+                                            onClick={() => onReject(index, cIdx)}
+                                            className="mini-btn reject-btn"
+                                        >
+                                            Reject
+                                        </button>
+                                    </>
+                                ) : change.status === 'applied' ? (
+                                    <div className="status-action-row">
+                                        <span className="status-label applied-label">✨ Applied</span>
+                                        <button
+                                            onClick={() => onReject(index, cIdx)}
+                                            className="revert-action-btn"
+                                            title="Revert to old version"
+                                        >
+                                            Apply Old
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="status-action-row">
+                                        <span className="status-label rejected-label">❌ Rejected</span>
+                                        <button
+                                            onClick={() => onApply(index, cIdx)}
+                                            className="revert-action-btn"
+                                            title="Apply proposed version instead"
+                                        >
+                                            Apply Anyway
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>

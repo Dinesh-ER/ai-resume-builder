@@ -538,3 +538,74 @@
         break-inside: avoid !important;
     }
 }
+
+/* ---------- Floating Selection Popup ---------- */
+.selection-popup-floating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    padding: 6px 8px 6px 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    animation: popupFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 8px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+.popup-floating-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 13px;
+    width: 160px;
+    transition: width 0.2s ease;
+}
+
+.popup-floating-input:focus {
+    width: 220px;
+}
+
+.popup-floating-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.popup-floating-send {
+    background: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.popup-floating-send:hover {
+    background: #6d28d9;
+    transform: scale(1.05);
+}
+
+.popup-floating-send:active {
+    transform: scale(0.95);
+}
+
+::highlight(selection-temp-highlight) {
+    background-color: rgba(124, 58, 237, 0.35) !important;
+    color: inherit !important;
+}
