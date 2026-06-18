@@ -159,3 +159,31 @@ select {
     background: rgba(255, 255, 255, 0.25);
   }
 }
+
+.loadercontainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background: #0f0f13;
+  color: #a1a1aa;
+  font-family: system-ui, sans-serif
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #27272a;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg)
+  }
+}

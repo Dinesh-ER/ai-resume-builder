@@ -5,11 +5,14 @@ import App from "./App";
 import {
   ResumeProvider,
 } from "./context/ResumeContent";
+import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
-  <ResumeProvider>
-    <App />
-  </ResumeProvider>
+  <AuthProvider>
+    <ResumeProvider>
+      <App />
+    </ResumeProvider>
+  </AuthProvider>
 );
