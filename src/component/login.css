@@ -1,0 +1,313 @@
+/* Google Login Button Styles */
+.login-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.demo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: #d97706;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.02); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.9; }
+}
+
+.google-signin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.google-signin-btn:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+}
+
+.google-signin-btn:active:not(:disabled) {
+    background-color: #f3f4f6;
+    transform: translateY(0);
+}
+
+.google-signin-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.google-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+}
+
+.google-btn-text {
+    flex-grow: 0;
+}
+
+/* Spinner */
+.btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #4285F4;
+    border-radius: 50%;
+    animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}
+
+.login-error-msg {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    text-align: center;
+    max-width: 280px;
+}
+
+/* Profile Dropdown Navigation styling */
+.user-profile-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.profile-avatar-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+}
+
+.profile-avatar-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #3b82f6;
+    transition: transform 0.2s ease;
+}
+
+.profile-avatar-btn:hover .user-avatar {
+    transform: scale(1.05);
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 220px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dropdown-header {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 6px;
+}
+
+.dropdown-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-email {
+    font-size: 0.75rem;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+.dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    color: #ef4444;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 500;
+    transition: background 0.15s ease;
+}
+
+.dropdown-btn:hover {
+    background: #fef2f2;
+}
+
+/* Login Modal overlay container */
+.login-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: overlayFadeIn 0.25s ease-out;
+}
+
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.login-modal-content {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.login-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.login-modal-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+    transform: scale(1.05);
+}
+
+.login-modal-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.login-modal-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+.login-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.login-modal-desc {
+    font-size: 0.875rem;
+    color: #475569;
+    margin-top: 8px;
+    line-height: 1.5;
+}

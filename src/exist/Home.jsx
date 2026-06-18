@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResumeContext } from "../context/ResumeContent.jsx";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -8,6 +8,7 @@ import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
 import * as pdfjsLib from "pdfjs-dist";
 import mammoth from "mammoth";
+import { useAuth } from "../context/AuthContext.jsx";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 const extractPdfText = async (file) => {
@@ -137,13 +138,25 @@ const extractDocxText = async (file) => {
 function Home() {
     const navigate = useNavigate();
     const { setResumeHTML, setDocumentTitle } = useContext(ResumeContext);
+    const { user, logout } = useAuth();
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [mode, setMode] = useState(null);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef(null);
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
     useEffect(() => {
         document.title = "AI Resume Builder";
+
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     const handleFresh = () => {
@@ -258,6 +271,43 @@ function Home() {
         <div className="home-page">
             <nav className="home-nav">
                 <div className="nav-brand">📝 ResumeAI</div>
+                {user && (
+                    <div className="nav-user-container">
+                        <div className="user-profile-menu" ref={dropdownRef}>
+                            <button
+                                className="profile-avatar-btn"
+                                onClick={() => setShowDropdown(!showDropdown)}
+                                aria-label="Toggle profile menu"
+                            >
+                                <img
+                                    src={user.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.displayName}`}
+                                    alt={user.displayName || "User"}
+                                    className="user-avatar"
+                                />
+                            </button>
+                            {showDropdown && (
+                                <div className="profile-dropdown">
+                                    <div className="dropdown-header">
+                                        <div className="dropdown-name">{user.displayName}</div>
+                                        <div className="dropdown-email">{user.email}</div>
+                                    </div>
+                                    <button
+                                        className="dropdown-btn"
+                                        onClick={() => {
+                                            logout();
+                                            setShowDropdown(false);
+                                        }}
+                                    >
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                                        </svg>
+                                        Sign Out
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </nav>
             <main className="home-main">
                 <div className="home-hero">
